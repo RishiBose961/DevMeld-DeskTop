@@ -7,6 +7,7 @@ interface PostData {
   whatyouwillgain: string[];
   duaration: string;
   noofparticipants: string;
+  pay: string;
   credits: string;
 }
 

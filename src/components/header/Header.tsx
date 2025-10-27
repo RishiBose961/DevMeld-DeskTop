@@ -1,14 +1,14 @@
 import {
   Bell,
-  Code,
   Edit2,
   LayoutDashboard,
   MessageSquare,
-  SquareGanttChart,
+  SquareGanttChart
 } from "lucide-react";
 import { useSelector } from "react-redux";
 import { Link, NavLink } from "react-router";
 import { Button } from "../ui/button";
+import Avatars from "/favicon.png"
 // import { useSelector } from "react-redux";
 // import { Link } from "react-router";
 // import { ModeToggle } from "../mode-toggle";
@@ -46,9 +46,7 @@ export const Header = () => {
           {/* Logo */}
 
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-              <Code className="w-5 h-5 text-white" />
-            </div>
+       <img src={Avatars} alt="Logo" className="size-10" />
             <h1 className="text-xl font-bold text-gray-900 dark:text-white">
               DevMeld
             </h1>

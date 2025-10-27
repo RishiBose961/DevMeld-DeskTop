@@ -48,6 +48,7 @@ const CreatePost = () => {
   const [duration, setDuration] = useState("");
   const [participants, setParticipants] = useState("");
   const [credits, setCredits] = useState("");
+  const [pay, setPay] = useState("");
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { user } = useSelector((state: any) => state.auth);
@@ -57,6 +58,7 @@ const CreatePost = () => {
     mutationFn: (postData: {
       title: string;
       description: string;
+      pay:string;
       requiredtech: string[];
       whatyouwillgain: string[];
       duaration: string;
@@ -84,6 +86,7 @@ const CreatePost = () => {
       description,
       requiredtech,
       whatyouwillgain,
+      pay,
       credits,
       duaration: duration,
       noofparticipants: participants,
@@ -280,6 +283,22 @@ const CreatePost = () => {
                   <SelectItem value="30">30</SelectItem>
                   <SelectItem value="50">50</SelectItem>
                   <SelectItem value="100">100</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </div>
+            <div className="space-y-2 mb-6">
+            <Label htmlFor="pays">Join Using Points</Label>
+            <Select value={pay} onValueChange={(val) => setPay(val)}>
+              <SelectTrigger className="h-11 w-full border-gray-500 focus:border-blue-500 focus:ring-blue-500">
+                <SelectValue placeholder="Select Join Using Points" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="Free">Free</SelectItem>
+                  <SelectItem value="40">40</SelectItem>
+                  <SelectItem value="80">80</SelectItem>
+                  <SelectItem value="120">120</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>

@@ -2,6 +2,7 @@ import TopCount from "@/components/DashBoard/TopCount";
 import NotificationDash from "@/components/Notification/NotificationDash";
 import { Button } from "@/components/ui/button";
 import { logoutUserAction } from "@/slice/authSlice";
+import { Radio } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 
 const DashBoard = () => {
@@ -35,7 +36,11 @@ const DashBoard = () => {
       </div>
 
       <TopCount />
-      <p className="text-xl font-bold text-gray-900 mt-4">Recent Activity</p>
+      <div className="flex items-center mt-4 mb-4 space-x-2">
+        <Radio className=" text-red-500 animate-pulse" />
+        <p className="text-xl font-bold text-gray-900">Recent Live Activity</p>
+      </div>
+
       <NotificationDash />
     </div>
   );
