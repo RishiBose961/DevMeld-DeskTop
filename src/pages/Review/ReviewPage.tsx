@@ -12,6 +12,7 @@ import UseGetAllPostbyid from "@/hook/posthook/UseGetAllPostbyid";
 import { Eye } from "lucide-react";
 import { Link } from "react-router";
 import CommunityRoom from "./CommunityRoom";
+import SubmissionCo from "./SubmissionCo";
 const ReviewPage = () => {
   const { isPending, getAllpostbyid } = UseGetAllPostbyid() as {
     isPending: boolean;
@@ -68,17 +69,20 @@ const ReviewPage = () => {
                   })}
                 </TableCell>
                 <TableCell>{post.credits}</TableCell>
-                <TableCell>0/{post.noofparticipants}</TableCell>
+                <TableCell>
+                  <div className="flex items-center">
+                    <SubmissionCo postid={post?._id} />/{post.noofparticipants}
+                  </div></TableCell>
                 <TableCell className=" space-x-3">
                   <Link to={`/post/${post._id}`}>
                     <Button className="cursor-pointer">
                       <Eye />
                     </Button>
                   </Link>
-                  <CommunityRoom title={post.title} id={post._id}/>
-                 
+                  <CommunityRoom title={post.title} id={post._id} />
+
                 </TableCell>
-              
+
               </TableRow>
             )
           )}
