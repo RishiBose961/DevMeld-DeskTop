@@ -1,7 +1,8 @@
 import { User, X } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
-interface User {
+interface UserType {
   id: string;
   username: string;
   displayName: string;
@@ -16,35 +17,50 @@ interface Tag {
   end: number;
 }
 
-const mockUsers: User[] = [
-  { id: "1", username: "johndoe", displayName: "John Doe" },
-  { id: "2", username: "sarahwilson", displayName: "Sarah Wilson" },
-  { id: "3", username: "mikejohnson", displayName: "Mike Johnson" },
-  { id: "4", username: "emilychen", displayName: "Emily Chen" },
-  { id: "5", username: "davidbrown", displayName: "David Brown" },
-  { id: "6", username: "lisagarcia", displayName: "Lisa Garcia" },
-  { id: "7", username: "alexsmith", displayName: "Alex Smith" },
-  { id: "8", username: "jenniferdavis", displayName: "Jennifer Davis" },
-];
-
-export default function UserTaggingInput({setTitle, title}: {setTitle: (title: string) => void, title: string}) {
-
-  const [suggestions, setSuggestions] = useState<User[]>([]);
+export default function UserTaggingInput({
+  setTitle,
+  title,
+}: {
+  setTitle: (title: string) => void;
+  title: string;
+}) {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [activeSuggestion, setActiveSuggestion] = useState(0);
   const [tags, setTags] = useState<Tag[]>([]);
   const [mentionStart, setMentionStart] = useState<number | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
+  const fetchUsers = async (): Promise<UserType[]> => {
+    const res = await fetch(
+      `http://localhost:5000/api/search/user?username=${searchQuery}`
+    );
+    if (!res.ok) throw new Error("Failed fetching users");
+
+    const json = await res.json();
+
+    const users = Array.isArray(json) ? json : [json];
+
+    return users.map((u) => ({
+      id: u._id,
+      username: u.username.replace("@", ""),
+      displayName: u.fullName,
+      avatar: u.avatar ?? undefined,
+    }));
+  };
+
+  const { data: suggestions = [], isLoading } = useQuery({
+    queryKey: ["search-users", searchQuery],
+    queryFn: fetchUsers,
+    enabled: searchQuery.length > 0,
+  });
+
   const findMentionStart = (text: string, cursorPos: number): number | null => {
     for (let i = cursorPos - 1; i >= 0; i--) {
-      if (text[i] === "@") {
-        return i;
-      }
-      if (text[i] === " " || text[i] === "\n") {
-        break;
-      }
+      if (text[i] === "@") return i;
+      if (text[i] === " " || text[i] === "\n") break;
     }
     return null;
   };
@@ -55,29 +71,21 @@ export default function UserTaggingInput({setTitle, title}: {setTitle: (title: s
 
     setTitle(value);
 
-
-    // Check if we're in a mention context
     const mentionStartPos = findMentionStart(value, cursorPos);
 
     if (mentionStartPos !== null) {
-      const mentionText = value.slice(mentionStartPos + 1, cursorPos);
-      const filteredUsers = mockUsers.filter(
-        (user) =>
-          user.username.toLowerCase().includes(mentionText.toLowerCase()) ||
-          user.displayName.toLowerCase().includes(mentionText.toLowerCase())
-      );
-
+      const mentionText = value.slice(mentionStartPos + 1, cursorPos).trim();
       setMentionStart(mentionStartPos);
-      setSuggestions(filteredUsers);
-      setShowSuggestions(filteredUsers.length > 0);
-      setActiveSuggestion(0);
+      setSearchQuery(mentionText);
+      setShowSuggestions(!!mentionText);
     } else {
       setShowSuggestions(false);
       setMentionStart(null);
+      setSearchQuery("");
     }
   };
 
-  const handleSuggestionClick = (user: User) => {
+  const handleSuggestionClick = (user: UserType) => {
     if (mentionStart === null) return;
 
     const cursorPos = inputRef.current?.selectionStart || 0;
@@ -98,8 +106,8 @@ export default function UserTaggingInput({setTitle, title}: {setTitle: (title: s
     setTags((prev) => [...prev, newTag]);
     setShowSuggestions(false);
     setMentionStart(null);
+    setSearchQuery("");
 
-    // Focus back to input
     setTimeout(() => {
       inputRef.current?.focus();
       const newCursorPos = mentionStart + mentionTag.length;
@@ -143,7 +151,6 @@ export default function UserTaggingInput({setTitle, title}: {setTitle: (title: s
     setTags((prev) => prev.filter((tag) => tag.id !== tagToRemove.id));
   };
 
-  // Close suggestions when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -153,34 +160,39 @@ export default function UserTaggingInput({setTitle, title}: {setTitle: (title: s
         setShowSuggestions(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-  
 
   return (
     <div>
       <div className="relative">
-        <div className="relative">
-          <input
-            ref={inputRef}
-            type="text"
-            value={title}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
-            placeholder="Enter title... Use @ to mention users"
-            className="w-full border-gray-500 focus:border-blue-500 focus:ring-blue-500 rounded-lg px-4 py-3 border  focus:ring-2 ocus:border-transparent outline-none transition-all duration-200 text-lg"
-          />
-          
-        </div>
+        <input
+          ref={inputRef}
+          type="text"
+          value={title}
+          onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
+          placeholder="Enter title... Use @ to mention users"
+          className="w-full border-gray-500 focus:border-blue-500 focus:ring-blue-500 rounded-lg px-4 py-3 border focus:ring-2 outline-none transition-all duration-200 text-lg"
+        />
 
-        {showSuggestions && suggestions.length > 0 && (
+        {showSuggestions && (
           <div
             ref={suggestionsRef}
             className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-10 mt-1 max-h-60 overflow-y-auto"
           >
-            {suggestions.map((user, index) => (
+            {isLoading && (
+              <div className="px-4 py-3 text-sm text-gray-500">Searching...</div>
+            )}
+
+            {!isLoading && suggestions.length === 0 && (
+              <div className="px-4 py-3 text-sm text-gray-500">
+                No users found
+              </div>
+            )}
+
+            {Array.isArray(suggestions) && suggestions.map((user, index) => (
               <div
                 key={user.id}
                 onClick={() => handleSuggestionClick(user)}
@@ -204,7 +216,6 @@ export default function UserTaggingInput({setTitle, title}: {setTitle: (title: s
           </div>
         )}
       </div>
- 
 
       {tags.length > 0 && (
         <div className="mt-4">
@@ -212,23 +223,23 @@ export default function UserTaggingInput({setTitle, title}: {setTitle: (title: s
             Tagged Users:
           </h3>
           <div className="flex flex-wrap gap-2">
-            {[
-              ...new Map(tags.map((tag) => [tag.displayName, tag])).values(),
-            ].map((tag) => (
-              <div
-                key={tag.id}
-                className="flex items-center gap-2 bg-blue-100 text-blue-800 px-3 py-1.5 rounded-full text-sm font-medium"
-              >
-                <User size={14} />
-                {tag.displayName}
-                <button
-                  onClick={() => removeTag(tag)}
-                  className="ml-1 hover:bg-blue-200 rounded-full p-0.5 transition-colors"
+            {[...new Map(tags.map((tag) => [tag.id, tag])).values()].map(
+              (tag) => (
+                <div
+                  key={tag.id}
+                  className="flex items-center gap-2 bg-blue-100 text-blue-800 px-3 py-1.5 rounded-full text-sm font-medium"
                 >
-                  <X size={12} />
-                </button>
-              </div>
-            ))}
+                  <User size={14} />
+                  {tag.displayName}
+                  <button
+                    onClick={() => removeTag(tag)}
+                    className="ml-1 hover:bg-blue-200 rounded-full p-0.5 transition-colors"
+                  >
+                    <X size={12} />
+                  </button>
+                </div>
+              )
+            )}
           </div>
         </div>
       )}

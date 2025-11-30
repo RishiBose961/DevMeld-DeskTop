@@ -14,6 +14,7 @@ import { createPostService } from "@/services/postService";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router";
 // --- Badge Component ---
 type BadgeProps = {
   text: string;
@@ -34,6 +35,7 @@ const Badge = ({ text, onRemove }: BadgeProps) => (
 );
 
 const CreatePost = () => {
+  const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [requiredtech, setRequiredTech] = useState<string[]>([
@@ -49,6 +51,7 @@ const CreatePost = () => {
   const [participants, setParticipants] = useState("");
   const [credits, setCredits] = useState("");
   const [pay, setPay] = useState("");
+
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { user } = useSelector((state: any) => state.auth);
@@ -67,7 +70,9 @@ const CreatePost = () => {
     }) => createPostService(postData, token),
     onSuccess: () => {
       alert("Post created successfully!");
+      navigate("/");
       resetForm();
+
     },
     onError: (error: unknown) => {
       if (error && typeof error === "object" && "message" in error) {

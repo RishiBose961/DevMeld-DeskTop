@@ -3,12 +3,12 @@ import { Header } from "./components/header/Header";
 import PrivateRoute from "./components/PrivateRoute";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
-import CommunityPage from "./pages/Community/CommunityPage";
 import CreatePost from "./pages/Create/CreatePost";
 import Home from "./pages/home/Home";
 import PlagCheck from "./pages/PostView/PlagCheck";
 import PostView from "./pages/PostView/PostView";
 import ReviewPage from "./pages/Review/ReviewPage";
+import ReviewBlockPage from "./pages/BlockPage/ReviewBlockPage";
 
 const App = () => {
   return (
@@ -23,9 +23,9 @@ const App = () => {
           <Route path="/*" element={<div>404</div>} />
           <Route path="" element={<PrivateRoute />}>
             <Route path="/create" element={<CreatePost />} />
-            <Route path="/review" element={<ReviewPage />} />
-            <Route path="/community" element={<CommunityPage />} />
+            <Route path="/review" element={<ReviewPage />} />Ō
             <Route path="/post/:id" element={<PostView/>} />
+            <Route path="/reviewblockpage" element={<ReviewBlockPage/>} />
             <Route path="/plagcheck/:id" element={<PlagCheck/>} />
           </Route>
         </Routes>

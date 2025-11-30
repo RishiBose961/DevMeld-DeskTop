@@ -1,14 +1,13 @@
 import {
-  Bell,
   Edit2,
   LayoutDashboard,
-  MessageSquare,
-  SquareGanttChart
+  SquareGanttChart,
+  TriangleAlertIcon
 } from "lucide-react";
 import { useSelector } from "react-redux";
 import { Link, NavLink } from "react-router";
 import { Button } from "../ui/button";
-import Avatars from "/favicon.png"
+import Avatars from "/favicon.png";
 // import { useSelector } from "react-redux";
 // import { Link } from "react-router";
 // import { ModeToggle } from "../mode-toggle";
@@ -32,10 +31,10 @@ export const Header = () => {
     { id: "Create", label: "Create", icon: Edit2, href: "create" },
     { id: "Review", label: "Review", icon: SquareGanttChart, href: "review" },
     {
-      id: "Community",
-      label: "Community",
-      icon: MessageSquare,
-      href: "community",
+      id: "Review Block",
+      label: "Block",
+      icon: TriangleAlertIcon,
+      href: "reviewblockpage",
     },
   ];
 
@@ -79,12 +78,7 @@ export const Header = () => {
 
           {/* User Section */}
           <div className="flex items-center space-x-4">
-            <button className="relative p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors">
-              <Bell className="w-5 h-5" />
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 rounded-full text-xs text-white flex items-center justify-center">
-                3
-              </span>
-            </button>
+        
 
             {isAuthenticated ? (
               <div className="flex items-center space-x-3">

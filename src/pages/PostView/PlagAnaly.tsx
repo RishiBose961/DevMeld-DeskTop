@@ -59,11 +59,12 @@ const CircleProgress = ({ value, size = 40, strokeWidth = 6 }: CircleProgressPro
 };
 
 const PlagAnaly = ({ plagdata }: PlagAnalyProps) => {
+  
   if (!plagdata || plagdata.topMatches.length === 0) {
     return <p>No matches found.</p>;
   }
 
-  console.log(plagdata);
+  // console.log(plagdata);
   
 
   return (
